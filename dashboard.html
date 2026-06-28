@@ -749,6 +749,14 @@
             width: 44px;
             text-align: center
         }
+        
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 
@@ -897,34 +905,34 @@
             </div>
         </div>
 
+        <script src="transformer.js"></script>
         <script>
             (function () {
                 let businesses = [], filtered = [], selected = new Set();
                 let sortCol = 'name', sortDir = 1, page = 1, activeDrawerId = null, quickFilter = null;
                 const PAGE_SIZE = 15;
 
-                function transform(raw) {
-                    if (!Array.isArray(raw)) raw = [raw];
-                    return raw.map((r, i) => ({
-                        id: r.id ?? (i + 1), name: r.name || 'Unnamed', category: r.category || 'unknown',
-                        location: r.location || { city: '', state: '', country: '' },
-                        search_engine: r.search_engine || '', search_url: r.search_url || '',
-                        phone: r.phone || '', email: r.email || '', website: r.website || '',
-                        status: r.status || 'Not Contacted', notes: r.notes || ''
-                    }));
-                }
-
                 document.getElementById('fileInput').addEventListener('change', function (e) {
                     const file = e.target.files[0]; if (!file) return;
                     const reader = new FileReader();
-                    reader.onload = function (ev) {
+                    reader.onload = async function (ev) {
+                        const uploadHintEl = document.querySelector('.upload-hint');
+                        const originalHint = uploadHintEl ? uploadHintEl.innerHTML : '';
+                        if (uploadHintEl) {
+                            uploadHintEl.innerHTML = '<i class="ti ti-loader animate-spin"></i>Processing and transforming data... Please wait.';
+                        }
                         try {
-                            businesses = transform(JSON.parse(ev.target.result));
+                            const parsed = JSON.parse(ev.target.result);
+                            businesses = await window.transformPipelineData(parsed);
                             selected.clear(); page = 1; quickFilter = null;
                             document.getElementById('qPhone').classList.remove('active');
                             document.getElementById('qEmail').classList.remove('active');
                             populateFilters(); applyAndRender();
-                        } catch (err) { alert('Invalid JSON file. Please check the format and try again.'); }
+                        } catch (err) {
+                            console.error(err);
+                            alert('Invalid JSON file or transformation error. Please check the format and try again.');
+                            if (uploadHintEl) uploadHintEl.innerHTML = originalHint;
+                        }
                     };
                     reader.readAsText(file); e.target.value = '';
                 });
