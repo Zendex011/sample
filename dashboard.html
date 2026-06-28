@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LeadFlow Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f3;
+            color: #1a1a18;
+            font-size: 14px;
+            min-height: 100vh
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px
+        }
+
+        input,
+        select,
+        textarea {
+            font-family: inherit;
+            font-size: 14px
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh
+        }
+
+        .topbar {
+            background: #fff;
+            border-bottom: 0.5px solid #e5e5e2;
+            padding: 0 20px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 50
+        }
+
+        .topbar-title {
+            font-weight: 500;
+            font-size: 15px;
+            white-space: nowrap
+        }
+
+        .topbar-title span {
+            color: #1a56db
+        }
+
+        .search-wrap {
+            flex: 1;
+            max-width: 320px;
+            position: relative
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9b9b96;
+            font-size: 15px;
+            pointer-events: none
+        }
+
+        .search-wrap input {
+            width: 100%;
+            height: 32px;
+            border: 0.5px solid #e5e5e2;
+            border-radius: 8px;
+            padding: 0 10px 0 30px;
+            background: #fafaf8;
+            color: #1a1a18;
+            outline: none;
+            transition: border-color .15s
+        }
+
+        .search-wrap input:focus {
+            border-color: #93c5fd
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto
+        }
+
+        .btn {
+            height: 32px;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 0.5px solid #d4d4d0;
+            font-weight: 500;
+            transition: background .12s, border-color .12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            color: #1a1a18;
+            background: #fff;
+            cursor: pointer
+        }
+
+        .btn:hover {
+            background: #fafaf8
+        }
+
+        .btn.primary {
+            background: #1a56db;
+            border-color: #1a56db;
+            color: #fff
+        }
+
+        .btn.primary:hover {
+            background: #1447c0
+        }
+
+        .btn i {
+            font-size: 15px
+        }
+
+        .main {
+            display: flex;
+            flex: 1;
+            gap: 0
+        }
+
+        .sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            border-right: 0.5px solid #e5e5e2;
+            padding: 16px 12px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 20px
+        }
+
+        .sidebar-section label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #9b9b96;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            display: block;
+            margin-bottom: 8px
+        }
+
+        .filter-select {
+            width: 100%;
+            height: 30px;
+            border: 0.5px solid #e5e5e2;
+            border-radius: 6px;
+            padding: 0 8px;
+            background: #fafaf8;
+            color: #1a1a18;
+            outline: none
+        }
+
+        .quick-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+
+        .qbtn {
+            height: 30px;
+            padding: 0 10px;
+            border-radius: 6px;
+            border: 0.5px solid #e5e5e2;
+            text-align: left;
+            font-size: 13px;
+            color: #6b6b67;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: background .1s, color .1s;
+            cursor: pointer;
+            background: #fff
+        }
+
+        .qbtn:hover,
+        .qbtn.active {
+            background: #fef2f2;
+            color: #b91c1c;
+            border-color: #fca5a5
+        }
+
+        .qbtn i {
+            font-size: 14px
+        }
+
+        .content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            padding: 16px 20px 0
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 0.5px solid #e5e5e2;
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #9b9b96;
+            font-weight: 500
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 500;
+            line-height: 1
+        }
+
+        .stat-value.accent {
+            color: #1a56db
+        }
+
+        .stat-value.green {
+            color: #16a34a
+        }
+
+        .stat-value.danger {
+            color: #b91c1c
+        }
+
+        .stat-value.amber {
+            color: #d97706
+        }
+
+        .table-area {
+            flex: 1;
+            padding: 16px 20px;
+            overflow: auto
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px
+        }
+
+        .table-meta {
+            font-size: 13px;
+            color: #9b9b96
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 6px
+        }
+
+        .bulk-btn {
+            height: 28px;
+            padding: 0 10px;
+            border-radius: 6px;
+            border: 0.5px solid #d4d4d0;
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b6b67;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background .1s;
+            background: #fff;
+            cursor: pointer
+        }
+
+        .bulk-btn:hover {
+            background: #fafaf8
+        }
+
+        .bulk-btn i {
+            font-size: 13px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 0.5px solid #e5e5e2;
+            border-radius: 10px;
+            overflow: hidden;
+            table-layout: fixed
+        }
+
+        thead {
+            background: #fafaf8
+        }
+
+        th {
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 500;
+            color: #9b9b96;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            border-bottom: 0.5px solid #e5e5e2;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        th:hover {
+            color: #6b6b67
+        }
+
+        th i {
+            font-size: 12px;
+            margin-left: 2px;
+            vertical-align: -1px
+        }
+
+        td {
+            padding: 8px 10px;
+            border-bottom: 0.5px solid #e5e5e2;
+            vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        tr:last-child td {
+            border-bottom: none
+        }
+
+        tr:hover td {
+            background: #fafaf8
+        }
+
+        tr.selected td {
+            background: #eff6ff
+        }
+
+        td.name-cell {
+            font-weight: 500;
+            color: #1a1a18;
+            cursor: pointer
+        }
+
+        td.name-cell:hover {
+            color: #1a56db
+        }
+
+        .missing {
+            color: #b91c1c;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .missing i {
+            font-size: 13px
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap
+        }
+
+        .badge.gray {
+            background: #f3f4f6;
+            color: #374151;
+            border: 0.5px solid #d1d5db
+        }
+
+        .badge.green {
+            background: #dcfce7;
+            color: #15803d;
+            border: 0.5px solid #86efac
+        }
+
+        .badge.amber {
+            background: #fef3c7;
+            color: #b45309;
+            border: 0.5px solid #fcd34d
+        }
+
+        .badge.blue {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 0.5px solid #93c5fd
+        }
+
+        .cat-badge {
+            display: inline-block;
+            padding: 1px 7px;
+            border-radius: 4px;
+            font-size: 11px;
+            background: #fafaf8;
+            border: 0.5px solid #e5e5e2;
+            color: #6b6b67;
+            text-transform: capitalize
+        }
+
+        .edit-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 0.5px solid #e5e5e2;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #9b9b96;
+            transition: background .1s, color .1s;
+            cursor: pointer;
+            background: #fff
+        }
+
+        .edit-btn:hover {
+            background: #fafaf8;
+            color: #1a1a18
+        }
+
+        .edit-btn i {
+            font-size: 14px
+        }
+
+        input[type=checkbox] {
+            width: 14px;
+            height: 14px;
+            accent-color: #1a56db;
+            cursor: pointer
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px 0 4px
+        }
+
+        .pg-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 0.5px solid #e5e5e2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #6b6b67;
+            transition: background .1s;
+            background: #fff;
+            cursor: pointer
+        }
+
+        .pg-btn:hover:not(:disabled) {
+            background: #fafaf8
+        }
+
+        .pg-btn:disabled {
+            opacity: .4;
+            cursor: default
+        }
+
+        .pg-btn.active {
+            background: #1a56db;
+            border-color: #1a56db;
+            color: #fff
+        }
+
+        .pg-info {
+            font-size: 12px;
+            color: #9b9b96;
+            padding: 0 6px
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .25);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s
+        }
+
+        .drawer-overlay.open {
+            opacity: 1;
+            pointer-events: all
+        }
+
+        .drawer {
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 380px;
+            background: #fff;
+            border-left: 0.5px solid #e5e5e2;
+            z-index: 101;
+            transform: translateX(100%);
+            transition: transform .22s cubic-bezier(.4, 0, .2, 1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .drawer.open {
+            transform: translateX(0)
+        }
+
+        .drawer-header {
+            padding: 16px 20px;
+            border-bottom: 0.5px solid #e5e5e2;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-shrink: 0
+        }
+
+        .drawer-name {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.3
+        }
+
+        .drawer-close {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 0.5px solid #e5e5e2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9b9b96;
+            flex-shrink: 0;
+            cursor: pointer;
+            background: #fff
+        }
+
+        .drawer-close:hover {
+            background: #fafaf8
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px
+        }
+
+        .field-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #9b9b96;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            display: flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .field-label i {
+            font-size: 13px
+        }
+
+        .field-val {
+            font-size: 13px;
+            color: #6b6b67;
+            padding: 6px 10px;
+            background: #fafaf8;
+            border-radius: 6px;
+            border: 0.5px solid #e5e5e2
+        }
+
+        .field-input {
+            height: 34px;
+            border: 0.5px solid #e5e5e2;
+            border-radius: 6px;
+            padding: 0 10px;
+            width: 100%;
+            background: #fff;
+            color: #1a1a18;
+            outline: none;
+            transition: border-color .12s
+        }
+
+        .field-input:focus {
+            border-color: #93c5fd
+        }
+
+        .field-input.warn {
+            border-color: #fca5a5
+        }
+
+        .field-select {
+            height: 34px;
+            border: 0.5px solid #e5e5e2;
+            border-radius: 6px;
+            padding: 0 10px;
+            width: 100%;
+            background: #fff;
+            color: #1a1a18;
+            outline: none
+        }
+
+        .field-textarea {
+            border: 0.5px solid #e5e5e2;
+            border-radius: 6px;
+            padding: 8px 10px;
+            width: 100%;
+            background: #fff;
+            color: #1a1a18;
+            outline: none;
+            resize: vertical;
+            min-height: 90px;
+            font-size: 13px;
+            transition: border-color .12s
+        }
+
+        .field-textarea:focus {
+            border-color: #93c5fd
+        }
+
+        .search-url {
+            font-size: 11px;
+            color: #1a56db;
+            word-break: break-all;
+            padding: 6px 10px;
+            background: #eff6ff;
+            border-radius: 6px;
+            border: 0.5px solid #93c5fd
+        }
+
+        .search-url a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        .search-url a:hover {
+            text-decoration: underline
+        }
+
+        .drawer-footer {
+            padding: 14px 20px;
+            border-top: 0.5px solid #e5e5e2;
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0
+        }
+
+        .drawer-footer .btn {
+            flex: 1;
+            justify-content: center
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #9b9b96;
+            text-align: center;
+            padding: 60px 20px;
+            border: 1.5px dashed #d4d4d0;
+            border-radius: 10px;
+            margin: 0
+        }
+
+        .upload-hint i {
+            font-size: 36px;
+            display: block;
+            margin: 0 auto 12px;
+            color: #d4d4d0
+        }
+
+        .col-chk {
+            width: 36px
+        }
+
+        .col-name {
+            width: 22%
+        }
+
+        .col-cat {
+            width: 13%
+        }
+
+        .col-city {
+            width: 12%
+        }
+
+        .col-phone {
+            width: 15%
+        }
+
+        .col-email {
+            width: 18%
+        }
+
+        .col-status {
+            width: 12%
+        }
+
+        .col-edit {
+            width: 44px;
+            text-align: center
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app" id="app">
+
+        <header class="topbar">
+            <div class="topbar-title">Lead<span>Flow</span></div>
+            <div class="search-wrap">
+                <i class="ti ti-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by name, city, phone, email…" />
+            </div>
+            <div class="topbar-actions">
+                <label class="btn" style="cursor:pointer">
+                    <i class="ti ti-upload"></i> Upload JSON
+                    <input type="file" id="fileInput" accept=".json" style="display:none" />
+                </label>
+                <button class="btn primary" id="exportBtn"><i class="ti ti-download"></i> Export</button>
+            </div>
+        </header>
+
+        <div class="main">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <label>Category</label>
+                    <select class="filter-select" id="filterCat">
+                        <option value="">All categories</option>
+                    </select>
+                </div>
+                <div class="sidebar-section">
+                    <label>City</label>
+                    <select class="filter-select" id="filterCity">
+                        <option value="">All cities</option>
+                    </select>
+                </div>
+                <div class="sidebar-section">
+                    <label>Status</label>
+                    <select class="filter-select" id="filterStatus">
+                        <option value="">All statuses</option>
+                        <option>Not Contacted</option>
+                        <option>Contacted</option>
+                        <option>Follow-up</option>
+                        <option>Closed</option>
+                    </select>
+                </div>
+                <div class="sidebar-section">
+                    <label>Quick filters</label>
+                    <div class="quick-btns">
+                        <button class="qbtn" id="qPhone"><i class="ti ti-phone-off"></i> Missing phone</button>
+                        <button class="qbtn" id="qEmail"><i class="ti ti-mail-off"></i> Missing email</button>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="content">
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-label">Total</div>
+                        <div class="stat-value accent" id="stTotal">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Contacted</div>
+                        <div class="stat-value green" id="stContacted">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Not contacted</div>
+                        <div class="stat-value" id="stNot">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Missing phone</div>
+                        <div class="stat-value danger" id="stPhone">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Missing email</div>
+                        <div class="stat-value amber" id="stEmail">0</div>
+                    </div>
+                </div>
+                <div class="table-area">
+                    <div class="table-header">
+                        <div class="table-meta" id="tableMeta">0 businesses</div>
+                        <div class="bulk-actions" id="bulkActions" style="display:none">
+                            <button class="bulk-btn" id="bkContacted"><i class="ti ti-check"></i> Mark
+                                contacted</button>
+                            <button class="bulk-btn" id="bkFollowup"><i class="ti ti-clock"></i> Mark follow-up</button>
+                            <button class="bulk-btn" id="bkExport"><i class="ti ti-download"></i> Export
+                                selected</button>
+                        </div>
+                    </div>
+                    <div id="tableWrap">
+                        <div class="upload-hint">
+                            <i class="ti ti-file-upload"></i>
+                            Upload a JSON file to get started.<br>
+                            <small style="margin-top:6px;display:block">Supports pipeline output with name, category,
+                                location, search_url fields.</small>
+                        </div>
+                    </div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="drawer-overlay" id="drawerOverlay"></div>
+        <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Business details">
+            <div class="drawer-header">
+                <div>
+                    <div class="drawer-name" id="dName"></div>
+                    <div style="margin-top:3px" id="dCat"></div>
+                </div>
+                <button class="drawer-close" id="drawerClose" aria-label="Close"><i class="ti ti-x"></i></button>
+            </div>
+            <div class="drawer-body">
+                <div class="field-group">
+                    <div class="field-label"><i class="ti ti-map-pin"></i> Location</div>
+                    <div class="field-val" id="dLocation"></div>
+                </div>
+                <div class="field-group">
+                    <div class="field-label"><i class="ti ti-world"></i> Search URL</div>
+                    <div class="search-url" id="dUrl"></div>
+                </div>
+                <div class="field-group">
+                    <div class="field-label"><i class="ti ti-phone"></i> Phone</div>
+                    <input class="field-input" id="dPhone" type="text" placeholder="Enter phone number" />
+                </div>
+                <div class="field-group">
+                    <div class="field-label"><i class="ti ti-mail"></i> Email</div>
+                    <input class="field-input" id="dEmail" type="text" placeholder="Enter email address" />
+                </div>
+                <div class="field-group">
+                    <div class="field-label"><i class="ti ti-tag"></i> Status</div>
+                    <select class="field-select" id="dStatus">
+                        <option>Not Contacted</option>
+                        <option>Contacted</option>
+                        <option>Follow-up</option>
+                        <option>Closed</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <div class="field-label"><i class="ti ti-notes"></i> Notes</div>
+                    <textarea class="field-textarea" id="dNotes"
+                        placeholder="Add notes about this business…"></textarea>
+                </div>
+            </div>
+            <div class="drawer-footer">
+                <button class="btn" id="drawerCancel">Cancel</button>
+                <button class="btn primary" id="drawerSave">Save changes</button>
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                let businesses = [], filtered = [], selected = new Set();
+                let sortCol = 'name', sortDir = 1, page = 1, activeDrawerId = null, quickFilter = null;
+                const PAGE_SIZE = 15;
+
+                function transform(raw) {
+                    if (!Array.isArray(raw)) raw = [raw];
+                    return raw.map((r, i) => ({
+                        id: r.id ?? (i + 1), name: r.name || 'Unnamed', category: r.category || 'unknown',
+                        location: r.location || { city: '', state: '', country: '' },
+                        search_engine: r.search_engine || '', search_url: r.search_url || '',
+                        phone: r.phone || '', email: r.email || '', website: r.website || '',
+                        status: r.status || 'Not Contacted', notes: r.notes || ''
+                    }));
+                }
+
+                document.getElementById('fileInput').addEventListener('change', function (e) {
+                    const file = e.target.files[0]; if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function (ev) {
+                        try {
+                            businesses = transform(JSON.parse(ev.target.result));
+                            selected.clear(); page = 1; quickFilter = null;
+                            document.getElementById('qPhone').classList.remove('active');
+                            document.getElementById('qEmail').classList.remove('active');
+                            populateFilters(); applyAndRender();
+                        } catch (err) { alert('Invalid JSON file. Please check the format and try again.'); }
+                    };
+                    reader.readAsText(file); e.target.value = '';
+                });
+
+                function populateFilters() {
+                    const cats = [...new Set(businesses.map(b => b.category))].sort();
+                    const cities = [...new Set(businesses.map(b => b.location.city))].filter(Boolean).sort();
+                    document.getElementById('filterCat').innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option>${c}</option>`).join('');
+                    document.getElementById('filterCity').innerHTML = '<option value="">All cities</option>' + cities.map(c => `<option>${c}</option>`).join('');
+                }
+
+                ['filterCat', 'filterCity', 'filterStatus', 'searchInput'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', () => { page = 1; applyAndRender(); });
+                });
+
+                document.getElementById('qPhone').addEventListener('click', function () {
+                    quickFilter = quickFilter === 'phone' ? null : 'phone';
+                    this.classList.toggle('active', quickFilter === 'phone');
+                    document.getElementById('qEmail').classList.remove('active');
+                    if (quickFilter === 'phone') { }
+                    else if (quickFilter === 'email') quickFilter = null;
+                    page = 1; applyAndRender();
+                });
+                document.getElementById('qEmail').addEventListener('click', function () {
+                    quickFilter = quickFilter === 'email' ? null : 'email';
+                    this.classList.toggle('active', quickFilter === 'email');
+                    document.getElementById('qPhone').classList.remove('active');
+                    page = 1; applyAndRender();
+                });
+
+                function applyFilters() {
+                    const cat = document.getElementById('filterCat').value;
+                    const city = document.getElementById('filterCity').value;
+                    const status = document.getElementById('filterStatus').value;
+                    const q = document.getElementById('searchInput').value.toLowerCase();
+                    filtered = businesses.filter(b => {
+                        if (cat && b.category !== cat) return false;
+                        if (city && b.location.city !== city) return false;
+                        if (status && b.status !== status) return false;
+                        if (quickFilter === 'phone' && b.phone) return false;
+                        if (quickFilter === 'email' && b.email) return false;
+                        if (q && !(b.name.toLowerCase().includes(q) || (b.location.city || '').toLowerCase().includes(q) || b.phone.toLowerCase().includes(q) || b.email.toLowerCase().includes(q))) return false;
+                        return true;
+                    });
+                    filtered.sort((a, b) => {
+                        let av = a[sortCol] || '', bv = b[sortCol] || '';
+                        if (sortCol === 'city') { av = a.location.city || ''; bv = b.location.city || ''; }
+                        return av < bv ? -sortDir : av > bv ? sortDir : 0;
+                    });
+                }
+
+                function updateStats() {
+                    document.getElementById('stTotal').textContent = businesses.length;
+                    document.getElementById('stContacted').textContent = businesses.filter(b => b.status === 'Contacted').length;
+                    document.getElementById('stNot').textContent = businesses.filter(b => b.status === 'Not Contacted').length;
+                    document.getElementById('stPhone').textContent = businesses.filter(b => !b.phone).length;
+                    document.getElementById('stEmail').textContent = businesses.filter(b => !b.email).length;
+                }
+
+                const STATUS_CLASS = { 'Not Contacted': 'gray', 'Contacted': 'green', 'Follow-up': 'amber', 'Closed': 'blue' };
+                function badge(s) { return `<span class="badge ${STATUS_CLASS[s] || 'gray'}">${s}</span>`; }
+
+                function renderTable() {
+                    const start = (page - 1) * PAGE_SIZE;
+                    const rows = filtered.slice(start, start + PAGE_SIZE);
+                    const allSel = rows.length && rows.every(r => selected.has(r.id));
+                    const si = col => sortCol === col ? (sortDir === 1 ? '<i class="ti ti-chevron-up"></i>' : '<i class="ti ti-chevron-down"></i>') : '';
+                    const tableHtml = `
+    <table>
+      <colgroup><col class="col-chk"><col class="col-name"><col class="col-cat"><col class="col-city"><col class="col-phone"><col class="col-email"><col class="col-status"><col class="col-edit"></colgroup>
+      <thead><tr>
+        <th><input type="checkbox" id="chkAll" ${allSel ? 'checked' : ''} /></th>
+        <th data-col="name">Name ${si('name')}</th>
+        <th data-col="category">Category ${si('category')}</th>
+        <th data-col="city">City ${si('city')}</th>
+        <th data-col="phone">Phone ${si('phone')}</th>
+        <th data-col="email">Email ${si('email')}</th>
+        <th data-col="status">Status ${si('status')}</th>
+        <th></th>
+      </tr></thead>
+      <tbody>${rows.map(b => `
+        <tr class="${selected.has(b.id) ? 'selected' : ''}" data-id="${b.id}">
+          <td><input type="checkbox" class="rowchk" data-id="${b.id}" ${selected.has(b.id) ? 'checked' : ''} /></td>
+          <td class="name-cell" title="${b.name}">${b.name}</td>
+          <td><span class="cat-badge">${b.category}</span></td>
+          <td title="${b.location.city}">${b.location.city || '—'}</td>
+          <td>${b.phone ? `<span title="${b.phone}">${b.phone}</span>` : '<span class="missing"><i class="ti ti-alert-circle"></i>Missing</span>'}</td>
+          <td>${b.email ? `<span title="${b.email}">${b.email}</span>` : '<span class="missing"><i class="ti ti-alert-circle"></i>Missing</span>'}</td>
+          <td>${badge(b.status)}</td>
+          <td style="text-align:center"><button class="edit-btn open-drawer" data-id="${b.id}" aria-label="Edit ${b.name}"><i class="ti ti-edit"></i></button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+                    document.getElementById('tableWrap').innerHTML = rows.length ? tableHtml : '<div class="upload-hint"><i class="ti ti-search-off"></i>No businesses match the current filters.</div>';
+                    document.getElementById('tableMeta').textContent = `${filtered.length} ${filtered.length === 1 ? 'business' : 'businesses'}${selected.size ? ` · ${selected.size} selected` : ''}`;
+                    document.getElementById('bulkActions').style.display = selected.size ? 'flex' : 'none';
+
+                    document.querySelectorAll('th[data-col]').forEach(th => {
+                        th.addEventListener('click', () => {
+                            const col = th.dataset.col;
+                            if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = 1; }
+                            applyAndRender();
+                        });
+                    });
+                    const chkAll = document.getElementById('chkAll');
+                    if (chkAll) chkAll.addEventListener('change', function () {
+                        rows.forEach(r => { if (this.checked) selected.add(r.id); else selected.delete(r.id); });
+                        renderTable(); renderPagination();
+                    });
+                    document.querySelectorAll('.rowchk').forEach(chk => {
+                        chk.addEventListener('change', function () {
+                            const id = +this.dataset.id;
+                            if (this.checked) selected.add(id); else selected.delete(id);
+                            renderTable(); renderPagination();
+                        });
+                    });
+                    document.querySelectorAll('.name-cell').forEach(td => {
+                        td.addEventListener('click', () => openDrawer(+td.closest('tr').dataset.id));
+                    });
+                    document.querySelectorAll('.open-drawer').forEach(btn => {
+                        btn.addEventListener('click', () => openDrawer(+btn.dataset.id));
+                    });
+                }
+
+                function renderPagination() {
+                    const total = Math.ceil(filtered.length / PAGE_SIZE) || 1;
+                    if (total <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+                    let html = `<button class="pg-btn" ${page <= 1 ? 'disabled' : ''} id="pgPrev"><i class="ti ti-chevron-left"></i></button>`;
+                    for (let i = 1; i <= total; i++) {
+                        if (i === 1 || i === total || Math.abs(i - page) <= 1) html += `<button class="pg-btn${i === page ? ' active' : ''}" data-p="${i}">${i}</button>`;
+                        else if (Math.abs(i - page) === 2) html += `<span class="pg-info">…</span>`;
+                    }
+                    html += `<button class="pg-btn" ${page >= total ? 'disabled' : ''} id="pgNext"><i class="ti ti-chevron-right"></i></button>`;
+                    document.getElementById('pagination').innerHTML = html;
+                    document.getElementById('pgPrev')?.addEventListener('click', () => { page--; applyAndRender(); });
+                    document.getElementById('pgNext')?.addEventListener('click', () => { page++; applyAndRender(); });
+                    document.querySelectorAll('[data-p]').forEach(b => b.addEventListener('click', () => { page = +b.dataset.p; applyAndRender(); }));
+                }
+
+                function applyAndRender() { applyFilters(); updateStats(); renderTable(); renderPagination(); }
+
+                function openDrawer(id) {
+                    const b = businesses.find(x => x.id === id); if (!b) return;
+                    activeDrawerId = id;
+                    document.getElementById('dName').textContent = b.name;
+                    document.getElementById('dCat').innerHTML = `<span class="cat-badge">${b.category}</span>`;
+                    document.getElementById('dLocation').textContent = [b.location.city, b.location.state, b.location.country].filter(Boolean).join(', ') || '—';
+                    const url = b.search_url;
+                    document.getElementById('dUrl').innerHTML = url ? `<a href="${url}" target="_blank" rel="noopener">${url}</a>` : '<span style="color:#9b9b96">—</span>';
+                    document.getElementById('dPhone').value = b.phone;
+                    document.getElementById('dPhone').className = 'field-input' + (!b.phone ? ' warn' : '');
+                    document.getElementById('dEmail').value = b.email;
+                    document.getElementById('dEmail').className = 'field-input' + (!b.email ? ' warn' : '');
+                    document.getElementById('dStatus').value = b.status;
+                    document.getElementById('dNotes').value = b.notes;
+                    document.getElementById('drawer').classList.add('open');
+                    document.getElementById('drawerOverlay').classList.add('open');
+                }
+
+                function closeDrawer() {
+                    document.getElementById('drawer').classList.remove('open');
+                    document.getElementById('drawerOverlay').classList.remove('open');
+                    activeDrawerId = null;
+                }
+
+                document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+                document.getElementById('drawerCancel').addEventListener('click', closeDrawer);
+                document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+                document.getElementById('drawerSave').addEventListener('click', () => {
+                    if (!activeDrawerId) return;
+                    const b = businesses.find(x => x.id === activeDrawerId); if (!b) return;
+                    b.phone = document.getElementById('dPhone').value.trim();
+                    b.email = document.getElementById('dEmail').value.trim();
+                    b.status = document.getElementById('dStatus').value;
+                    b.notes = document.getElementById('dNotes').value;
+                    closeDrawer(); applyAndRender();
+                });
+                document.getElementById('dPhone').addEventListener('input', function () { this.className = 'field-input' + (this.value.trim() ? '' : ' warn'); });
+                document.getElementById('dEmail').addEventListener('input', function () { this.className = 'field-input' + (this.value.trim() ? '' : ' warn'); });
+
+                document.getElementById('bkContacted').addEventListener('click', () => {
+                    businesses.forEach(b => { if (selected.has(b.id)) b.status = 'Contacted'; }); selected.clear(); applyAndRender();
+                });
+                document.getElementById('bkFollowup').addEventListener('click', () => {
+                    businesses.forEach(b => { if (selected.has(b.id)) b.status = 'Follow-up'; }); selected.clear(); applyAndRender();
+                });
+                document.getElementById('bkExport').addEventListener('click', () => exportJSON(businesses.filter(b => selected.has(b.id))));
+
+                function exportJSON(data) {
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'leads_export.json';
+                    a.click();
+                }
+                document.getElementById('exportBtn').addEventListener('click', () => exportJSON(businesses));
+            })();
+        </script>
+</body>
+
+</html>
